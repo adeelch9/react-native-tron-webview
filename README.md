@@ -23,7 +23,7 @@ npm install file:/path/to/react-native-tron-webview
 
 ```js
 import provider from './tronwallet';
-import { Web3View } from '@adeelch9/react-native-tron-webview';
+import { Web3View } from 'react-native-tron-webview';
 
 function MyApp() {
   const ref = useRef();
