@@ -6,8 +6,17 @@ This is a fork of react-native-dapp-explorer modified to work with Tron network.
 
 ## Installation
 
+Since this package is not yet published to npm, you can install it using one of the following methods:
+
+### From GitHub
 ```sh
-npm install @adeelch9/react-native-tron-webview
+npm install git+https://github.com/adeelch9/react-native-tron-webview.git
+```
+
+### From Local Directory
+If you have the package locally:
+```sh
+npm install file:/path/to/react-native-tron-webview
 ```
 
 ## Usage
