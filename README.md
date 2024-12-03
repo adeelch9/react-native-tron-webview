@@ -1,30 +1,29 @@
-# react-native-dapp-explorer (⚠️Beta)
+# react-native-tron-webview (⚠️Beta)
 
-web3 dapp wallet injector webview for react-native
+web3 dapp wallet injector webview for react-native with Tron network support
 
-This package is still under development! CONTRIBUTIONS ARE HIGHLY APPRECIATED!
+This is a fork of react-native-dapp-explorer modified to work with Tron network.
 
 ## Installation
 
 ```sh
-npm install react-native-dapp-explorer
+npm install @adeelch9/react-native-tron-webview
 ```
 
 ## Usage
 
 ```js
-import provider from ./web3wallet';
-import { Web3View } from 'react-native-dapp-explorer';
+import provider from './tronwallet';
+import { Web3View } from '@adeelch9/react-native-tron-webview';
 
 function MyApp() {
-
   const ref = useRef();
 
   return (
     <Web3InjectedWalletView
       provider={provider}
-      chainId={1}
-      url="https://your-dapp-url.com"
+      chainId="728126428" // Tron Mainnet
+      url="https://your-tron-dapp-url.com"
       style={{ flex: 1, width: '100%' }}
       webviewRef={ref}
     />
@@ -32,6 +31,9 @@ function MyApp() {
 }
 ```
 
+## Supported Networks
+- Tron Mainnet (chainId: 728126428)
+- Tron Sepolia Testnet (chainId: 11155111)
 
 ## Contributing
 
