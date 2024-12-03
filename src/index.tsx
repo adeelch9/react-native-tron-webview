@@ -11,23 +11,23 @@ const Web3View = ({ provider, url, chainId, style }) => {
     try {
       let result;
       switch (method) {
-        case 'eth_accounts':
-        case 'eth_requestAccounts':
+        case 'trx_accounts':
+        case 'trx_requestAccounts':
           result = [await provider.getAddress()];
           break;
 
-        case 'eth_chainId': {
+        case 'trx_chainId': {
           const _chainId = await provider.getChainId(chainId);
           result = '0x' + _chainId.toString(16);
           break;
         }
 
-        case 'eth_blockNumber': {
+        case 'trx_blockNumber': {
           result = await provider.getBlockNumber(chainId);
           break;
         }
 
-        case 'eth_signTypedData_v4': {
+        case 'trx_signTypedData_v4': {
           result = await provider.signMessage(params[1]);
 
           break;
@@ -39,21 +39,21 @@ const Web3View = ({ provider, url, chainId, style }) => {
           result = await provider.signMessage(params[0]);
           break;
 
-        case 'eth_sendTransaction': {
+        case 'trx_sendTransaction': {
           result = await provider.sendTransaction({ ...params[0], chainId });
           break;
         }
-        case 'wallet_switchEthereumChain': {
-          const chainId = parseInt(params[0].chainId, 16);
-          provider.setChainId(chainId);
+        case 'wallet_switchTronChain': {
+          const walletChainId = parseInt(params[0].chainId, 16);
+          provider.setChainId(walletChainId);
 
           break;
         }
 
-        case 'eth_estimateGas':
+        case 'trx_estimateGas':
           result = '0x5208';
           break;
-        case 'eth_call':
+        case 'trx_call':
           result = await provider.call({ method, params }, chainId);
           break;
 
@@ -85,7 +85,7 @@ const Web3View = ({ provider, url, chainId, style }) => {
 
   useEffect(() => {
     const injectedScript = `
-            window.ethereum = {
+            window.tron = {
                 request: async function({method, params}) {
                     return new Promise((resolve, reject) => {
                       const messageId = Date.now() * Math.pow(10, 3) +  Math.floor(Math.random() * Math.pow(10, 3));
@@ -110,7 +110,7 @@ const Web3View = ({ provider, url, chainId, style }) => {
                 // isMetaMask: true,
                 isConnected: () => true,
             };
-            window.web3 = { currentProvider: window.ethereum };
+            window.web3 = { currentProvider: window.tron };
             true;  // ensure the injected script doesn't return a value
         `;
 
