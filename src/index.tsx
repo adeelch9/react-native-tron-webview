@@ -13,23 +13,22 @@ const Web3View = ({ provider, url, chainId, style }) => {
       switch (method) {
         case 'trx_accounts':
         case 'trx_requestAccounts':
-          result = [await provider.getAddress()];
+          result = 'your address';
           break;
 
         case 'trx_chainId': {
-          const _chainId = await provider.getChainId(chainId);
+          const _chainId = chainId || 1;
           result = '0x' + _chainId.toString(16);
           break;
         }
 
         case 'trx_blockNumber': {
-          result = await provider.getBlockNumber(chainId);
+          result = '0x1';
           break;
         }
 
         case 'trx_signTypedData_v4': {
-          result = await provider.signMessage(params[1]);
-
+          result = '0x1';
           break;
         }
 
@@ -40,17 +39,14 @@ const Web3View = ({ provider, url, chainId, style }) => {
           break;
 
         case 'trx_sendTransaction': {
-          result = await provider.sendTransaction({ ...params[0], chainId });
-          break;
-        }
-        case 'wallet_switchTronChain': {
-          const walletChainId = parseInt(params[0].chainId, 16);
-          provider.setChainId(walletChainId);
-
+          result = await provider.sendTransaction({
+            ...params[0],
+            chainId: '1',
+          });
           break;
         }
 
-        case 'trx_estimateGas':
+        case 'trx_':
           result = '0x5208';
           break;
         case 'trx_call':
