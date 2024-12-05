@@ -1,78 +1,60 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { WebView } from 'react-native-webview';
+import { TronWeb } from 'tronweb';
 
 const Web3View = ({ provider, url, chainId, style }) => {
   const webViewRef = useRef(null);
   const [injectedJavaScript, setInjectedJavaScript] = useState(null);
+  const tronWeb = new TronWeb({
+    fullHost: provider,
+  });
 
   const handleMessage = async (event) => {
     const { method, params, id } = JSON.parse(event.nativeEvent.data);
 
     try {
+      const methodsMap = {
+        trx_accounts: async () => ['TR1NQvHhQV8B9aW4s8jxJgEjQH7dPvMvz'],
+        tron_requestAccounts: async () => ['TR1NQvHhQV8B9aW4s8jxJgEjQH7dPvMvz'],
+        trx_chainId: async () => {
+          const _chainId = await tronWeb.address.toHex(chainId);
+          return '0x' + _chainId.toString();
+        },
+        trx_blockNumber: async () => await tronWeb.trx.getCurrentBlock(),
+        trx_getBalance: async () =>
+          await tronWeb.trx.getBalance('TR1NQvHhQV8B9aW4s8jxJgEjQH7dPvMvz'),
+        trx_getTransactionCount: async () =>
+          await tronWeb.trx.getTransactionInfo(
+            'TR1NQvHhQV8B9aW4s8jxJgEjQH7dPvMvz'
+          ),
+        sendRawTransaction: async () =>
+          await tronWeb.trx.sendTransaction(
+            'TR1NQvHhQV8B9aW4s8jxJgEjQH7dPvMvz',
+            10000
+          ),
+        signMessage: async () =>
+          await tronWeb.trx.signTransaction(
+            'TR1NQvHhQV8B9aW4s8jxJgEjQH7dPvMvz'
+          ),
+        trx_sign: async () =>
+          await tronWeb.trx.sign('TR1NQvHhQV8B9aW4s8jxJgEjQH7dPvMvz'),
+        sendTransaction: async () =>
+          await tronWeb.trx.getBalance('TR1NQvHhQV8B9aW4s8jxJgEjQH7dPvMvz'),
+      };
+
       let result;
-      switch (method) {
-        case 'trx_accounts':
-        case 'trx_requestAccounts':
-          result = 'your address';
-          break;
 
-        case 'trx_chainId': {
-          const _chainId = chainId || 1;
-          result = '0x' + _chainId.toString(16);
-          break;
-        }
-
-        case 'trx_blockNumber': {
-          result = '0x1';
-          break;
-        }
-
-        case 'trx_signTypedData_v4': {
-          result = '0x1';
-          break;
-        }
-
-        case 'personal_sign':
-          console.log('result', result, method, params);
-
-          result = await provider.signMessage(params[0]);
-          break;
-
-        case 'trx_sendTransaction': {
-          result = await provider.sendTransaction({
-            ...params[0],
-            chainId: '1',
-          });
-          break;
-        }
-
-        case 'trx_':
-          result = '0x5208';
-          break;
-        case 'trx_call':
-          result = await provider.call({ method, params }, chainId);
-          break;
-
-        default:
-          console.log('inside default');
-
-          result = await provider.send(
-            {
-              method,
-              params,
-              jsonrpc: '2.0',
-            },
-            chainId
-          );
-          console.log('result', result, method, params);
+      if (methodsMap[method]) {
+        result = await methodsMap[method]();
+      } else {
+        console.log('Method not explicitly handled, delegating to tronWeb');
+        throw new Error('Method not supported');
       }
 
-      console.log('result', result, method, params);
-
+      console.log('Result:', result, method, params);
       webViewRef.current?.postMessage(JSON.stringify({ id, result }));
     } catch (error) {
-      console.log('error', error);
-
+      console.error('Error:', error);
       webViewRef.current?.postMessage(
         JSON.stringify({ id, error: error.message })
       );
@@ -81,7 +63,7 @@ const Web3View = ({ provider, url, chainId, style }) => {
 
   useEffect(() => {
     const injectedScript = `
-            window.tron = {
+            window.tronLink = {
                 request: async function({method, params}) {
                     return new Promise((resolve, reject) => {
                       const messageId = Date.now() * Math.pow(10, 3) +  Math.floor(Math.random() * Math.pow(10, 3));
@@ -103,10 +85,11 @@ const Web3View = ({ provider, url, chainId, style }) => {
                       });
                     });
                 },
-                // isMetaMask: true,
+                isTronLink: true,
                 isConnected: () => true,
+                ready: true
             };
-            window.web3 = { currentProvider: window.tron };
+            window.tronWeb = { currentProvider: window.tronLink };
             true;  // ensure the injected script doesn't return a value
         `;
 

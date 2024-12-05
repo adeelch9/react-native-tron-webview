@@ -2,7 +2,7 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "react-native-dapp-explorer": ["./src/index"]
+      "react-native-tron-webview": ["./src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
